@@ -1,0 +1,108 @@
+{% extends 'TRLife/base.html' %}
+{% block content %}
+
+<!-- Sidebar/menu -->
+<nav class="w3-sidebar w3-bar-block w3-white w3-collapse w3-top" style="z-index:3;width:250px" id="mySidebar">
+    <!-- Logo -->
+    <div class="w3-container w3-display-container w3-padding-16">
+        <i onclick="w3_close()" class="fa fa-remove w3-hide-large w3-button w3-display-topright"></i>
+            <h3 class="w3-wide"><b>{{substation.short_name}}</b></h3>
+    </div>
+    <div class="w3-container w3-text-grey" id="subtitle"><p>{{substation.name}}</p> </div>
+
+  <!-- Transformadores -->
+  <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
+    {% for tr in substation.transformer_set.all %}
+        <a href="{% url 'detail_transformer' se_short_name=tr.substation tr_name=tr.name%}" class="w3-bar-item w3-button">{{tr.name}}</a>
+    {% endfor %}
+  </div>
+
+
+</nav>
+
+<!-- Top menu on small screens -->
+<header class="w3-bar w3-top w3-hide-large w3-black w3-xlarge">
+  <div class="w3-bar-item w3-padding-24 w3-wide">PROFMAT</div>
+  <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding-24 w3-right" onclick="w3_open()"><i class="fa fa-bars"></i></a>
+</header>
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:250px">
+
+  <!-- Top header -->
+  <header class="w3-container w3-xlarge">
+    <p class="w3-left">{{transformer.name}}</p>
+    <a href="/" class="w3-right"><i class="fa fa-fw fa-home"></i></a>
+  </header>
+
+    <!-- Informações do transformador -->
+
+    <div class="w3-row-padding w3-light-grey w3-small">
+      <div class="w3-col s4">
+        <p>Início da operação: {{transformer.install_date}}</p>
+        <p>Número de série: {{transformer.serial_number}}</p>
+      </div>
+      <div class="w3-col s4">
+        <p>Potência Nominal: {{transformer.nominal_power}} MVA</p>
+        <p>Tensão de operação: {{transformer.voltage}} kV</p>
+      </div>
+      <div class="w3-col s4">
+        <p>Classe de temperatura: {{transformer.class_temperature}} °C </p>
+      </div>
+    </div>
+
+
+<canvas id="myChart">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+    <script>
+    var data_json = JSON.parse('{{ data_json|safe }}');
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var chart = new Chart(ctx, {
+    // The type of chart we want to create
+    type: 'line',
+
+    // The data for our dataset
+     data: {
+        labels: data_json.x_values,
+        datasets: [
+        {label: "IEEE", fill: false, backgroundColor: 'rgb(255, 99, 132)', borderColor: 'rgb(255, 99, 132)',data: data_json.ieee_values},
+        {label: "Fuzzy", fill: false,backgroundColor: 'rgb(99, 255, 132)', borderColor: 'rgb(99, 255, 132)', data: data_json.fuzzy_values},
+        {label: "Carriel", fill: false,backgroundColor: 'rgb(132, 99, 255)', borderColor: 'rgb(132, 99, 255)', data: data_json.carriel_values}
+        ]
+    },
+
+    // Configuration options go here
+    options: {}
+});
+</script>
+</canvas>
+
+
+    <div class="w3-row-padding w3-light-grey w3-small">
+      <div class="w3-col s4">
+        <p>Tempo em operação: {{life_days.real}} </p>
+        <p>Tempo de vida calculado: </p>
+        <p>-   IEEE: {{life_days.ieee}}  </p>
+        <p>-   Fuzzy: {{life_days.fuzzy}} </p>
+        <p>-   Carriel: {{life_days.carriel}} </p>
+      </div>
+      <div class="w3-col s4">
+        <p>Expectativa de vida: 40 anos </p>
+        <p>Tempo de vida restante: </p>
+        <p>-   IEEE: {{life_days.ieee_remaining}}  </p>
+        <p>-   Fuzzy: {{life_days.fuzzy_remaining}} </p>
+        <p>-   Carriel: {{life_days.carriel_remaining}} </p>
+
+      </div>
+      <div class="w3-col s4">
+        <p>Média de água: {{life_days.agua}}</p>
+        <p>Média de oxigênio: {{life_days.oxigenio}} </p>
+        <p>Média de temperatura: {{life_days.temperatura}} °C</p>
+      </div>
+    </div>
+
+</div>
+{% endblock %}

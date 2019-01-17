@@ -1,0 +1,68 @@
+{% extends 'TRLife/base.html' %}
+{% block content %}
+
+<!-- Sidebar/menu -->
+<nav class="w3-sidebar w3-bar-block w3-white w3-collapse w3-top" style="z-index:3;width:250px" id="mySidebar">
+    <!-- Logo -->
+    <div class="w3-container w3-display-container w3-padding-16">
+    <i onclick="w3_close()" class="fa fa-remove w3-hide-large w3-button w3-display-topright"></i>
+    <h3 class="w3-wide"><b>PROFMAT</b></h3>
+  </div>
+
+  <!-- Substações -->
+  <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
+    {% for region in region_list %}
+    <a onclick="myFuncVisible(this.innerHTML)" href="javascript:void(0)" class="w3-button w3-block w3-white w3-left-align">{{region.name}}</a>
+
+        <div id={{region.name}} class="w3-bar-block w3-hide w3-padding-large w3-medium">
+            {% for substation in region.substation_set.all %}
+            <a href={{substation.short_name}} class="w3-bar-item w3-button">{{substation.name}}</a>
+            {% endfor %}
+        </div>
+
+    {% endfor %}
+  </div>
+</nav>
+
+<!-- Top menu on small screens -->
+<header class="w3-bar w3-top w3-hide-large w3-black w3-xlarge">
+  <div class="w3-bar-item w3-padding-24 w3-wide">PROFMAT</div>
+  <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding-24 w3-right" onclick="w3_open()"><i class="fa fa-bars"></i></a>
+</header>
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:250px">
+
+  <!-- Push down content on small screens -->
+  <div class="w3-hide-large" style="margin-top:83px"></div>
+
+  <!-- Top header fa fa-briefcase -->
+  <header class="w3-container w3-xlarge">
+    <p class="w3-left">Cálculo tempo de vida do isolamento do transformador</p>
+    <a href="admin" class="w3-right"><i class="fa fa-gear"></i></a>
+  </header>
+
+  <div class="w3-container w3-text-grey" id="jeans">
+    <p>Este programa faz parte da dissertação de mestrado "Modelagem fuzzy do tempo de vida do isolamento do transformador e proposta de projeto interdisciplinar da construção e modelagem de uma turbina hidrelétrica"  apresentada como parte dos requisitos para obtenção do título de Mestre em Matemática, junto ao Programa de Pós-Graduação - Mestrado Profissional em Matemática em Rede Nacional, do Instituto de Geociências e Ciências Exatas da Universidade Estadual Paulista Júlio de Mesquita Filho, Câmpus de Rio Claro
+</p>
+  </div>
+
+
+  <div class="w3-row w3-grayscale">
+    <p>O algoritmo calcula o desgaste do isolamento do transformador diariamente por três métodos:</p>
+      <ul>
+          <li>Norma IEEE</li>
+          <li>Modelagem Fuzzy</li>
+          <li>Modelagem de Lázaro Carriel</li>
+      </ul>
+      <p>Os três valores calculados são exibidos na página para o usuário junto com a média do valor da água e do oxigênio </p>
+  </div>
+
+  <div class="w3-black w3-center w3-padding-24">Paula Enéas</div>
+
+
+</div>
+{% endblock %}
