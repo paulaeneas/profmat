@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, render
 from .models import Region, Substation, Transformer
 import datetime
 import json
-import pandas as pd
+#import pandas as pd
 
 
 def index(request):
@@ -35,74 +35,21 @@ def detail_transformer(request, se_short_name, tr_name):
 
 def data_transformer(transformer):
 
-    #Grafico
-    df_chart = pd.read_excel(transformer.path_name + '.xlsx')
-    x_arr = [x for x in df_chart['mes'] ]
-    ieee_arr = [i for i in df_chart['IEEE'] ]
-    fuzzy_arr = [ f for f in df_chart['Fuzzy'] ]
-    carriel_arr = [c for c in df_chart['Carriel'] ]
+    life_days = {'real': 22,
+                 'ieee': 23,
+                 'fuzzy': 24,
+                 'carriel': 25,
+                 'ieee_remaining': "{:.1f} anos".format(3.56),
+                 'fuzzy_remaining': "{:.1f} anos".format(4.67),
+                 'carriel_remaining': "{:.1f} anos".format(7.8),
+                 'agua':0.2 ,
+                 'oxigenio':20000,
+                 'temperatura':round(93.76,1)}
 
-    # Excel - resumo
-    df = pd.read_excel('TRresumo.xlsx')
-    df.set_index('TR', inplace=True)
-    df_TR = df.loc[transformer.path_name]
-    ieee_sum_pu = df_TR['ieee_sum']
-    fuzzy_sum_pu = df_TR['fuzzy_sum']
-    carriel_sum_pu = df_TR['carriel_sum']
-    agua_mean = df_TR['agua_mean']
-    oxigenio_mean = df_TR['oxigenio_mean']
-    temp_mean = df_TR['temp_mean']
-    start_excel_day = df_TR['start_excel_day']
-    end_excel_day = df_TR['end_excel_day']
-
-    # Life time
-    install_date = transformer.install_date
-    start_excel_day = datetime.date(start_excel_day.year, start_excel_day.month, start_excel_day.day)
-    end_excel_day = datetime.date(end_excel_day.year, end_excel_day.month, end_excel_day.day)
-    excel_days = (end_excel_day - start_excel_day).days
-    if install_date < start_excel_day:
-        before_days = (start_excel_day - install_date).days
-    else:
-        before_days = 0
-
-    ieee_factor = (ieee_sum_pu / excel_days)
-    fuzzy_factor = (fuzzy_sum_pu / excel_days)
-    carriel_factor = (carriel_sum_pu / excel_days)
-
-    real_life_days = excel_days
-    ieee_life_days = int (excel_days/ieee_factor)
-    fuzzy_life_days = int(excel_days/fuzzy_factor)
-    carriel_life_days = int(excel_days/carriel_factor)
-
-    before_years = round(before_days/365, 1)
-    real_life_years = round(real_life_days/365, 1)
-    ieee_life_years = round(ieee_life_days/365, 1)
-    fuzzy_life_years = round(fuzzy_life_days/365, 1)
-    carriel_life_years = round(carriel_life_days/365, 1)
-
-    real_life = "{} + {} = {} anos".format(before_years, real_life_years, round(before_years+real_life_years, 1) )
-    ieee_life = "{} + {} = {} anos".format(before_years, ieee_life_years,  round(before_years+ieee_life_years, 1))
-    fuzzy_life = "{} + {} = {} anos".format(before_years, fuzzy_life_years,  round(before_years+fuzzy_life_years, 1))
-    carriel_life = "{} + {} = {} anos".format(before_years, carriel_life_years, round(before_years+carriel_life_years, 1))
-
-    agua, oxigenio = dga_classification(agua_mean, oxigenio_mean)
-    expected_life = 40
-
-    life_days = {'real': real_life,
-                 'ieee': ieee_life,
-                 'fuzzy': fuzzy_life,
-                 'carriel': carriel_life,
-                 'ieee_remaining': "{:.1f} anos".format(expected_life-ieee_life_years-before_years),
-                 'fuzzy_remaining': "{:.1f} anos".format(expected_life-fuzzy_life_years-before_years),
-                 'carriel_remaining': "{:.1f} anos".format(expected_life-carriel_life_years-before_years),
-                 'agua':agua ,
-                 'oxigenio':oxigenio,
-                 'temperatura':round(temp_mean,1)}
-
-    # x_arr = ["January", "February", "March", "April", "May", "June", "July"]
-    # ieee_arr = [0, 10, 5, 2, 20, 30, 45]
-    # carriel_arr = [1, 11, 6, 3, 21, 31, 46]
-    # fuzzy_arr = [2, 12, 7, 4, 22, 32, 47]
+    x_arr = ["January", "February", "March", "April", "May", "June", "July"]
+    ieee_arr = [0, 10, 5, 2, 20, 30, 45]
+    carriel_arr = [1, 11, 6, 3, 21, 31, 46]
+    fuzzy_arr = [2, 12, 7, 4, 22, 32, 47]
 
     data = {'x_values': x_arr,
             'ieee_values':  ieee_arr,
